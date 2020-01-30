@@ -51,20 +51,22 @@ class ShortUrlController extends Controller
     public function shortenLink(Request $request, $code)
     {
         $k = $request->input('k', null);
-
         $user = User::where('code', $k)->first();
         $userId = $user? $user->id:null;
-
         $httpReferer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
-
-        $find = ShortUrl::where('code', $code)->first();
-        $find->counter += 1;
-        $find->save();
-
-        $ref = $find->referers()->updateOrCreate(['refer_name'=>$httpReferer,'user_id' => $userId], [   'counter' => DB::raw('counter+1') ]);
-
-   
-        return redirect($find->url);
+        DB::beginTransaction();
+        try {
+            $find = ShortUrl::where('code', $code)->first();
+            $find->counter += 1;
+            $find->save();
+    
+            $ref = $find->referers()->updateOrCreate(['refer_name'=>$httpReferer,'user_id' => $userId], [   'counter' => DB::raw('counter+1') ]);
+            DB::commit();
+            return redirect($find->url);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $e->getMessage();
+        }  
     }
 
     public function show($id)
