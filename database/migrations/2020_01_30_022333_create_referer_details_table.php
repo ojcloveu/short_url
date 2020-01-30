@@ -20,6 +20,9 @@ class CreateRefererDetailsTable extends Migration
             $table->bigInteger('short_urls_id');
             $table->bigInteger('user_id')->nullable()->default(0);
             $table->string('refer_name')->nullable();
+            $table->string('remote_addr')->nullable();
+            $table->integer('request_at')->unsigned()->nullable()->default(0);
+            $table->integer('counter')->unsigned()->nullable()->default(0);
         
             $table->timestamps();
         });

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>How to create url shortener using Laravel?</h1>
+    <h1>How to create url shortener?</h1>
    
     <div class="card">
       <div class="card-header">
@@ -28,8 +28,9 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Short Link</th>
+                   
                         <th>Link</th>
+                        <th>Share</th>
                         <th>Counter</th>
                     </tr>
                 </thead>
@@ -37,16 +38,20 @@
                     @foreach($shortLinks as $row)
                         <tr>
                             <td>{{ $row->id }}</td>
-                            <td>
-                                @guest
-                                <a href="{{ route('shorten.link', $row->code) }}" target="_blank">{{ route('shorten.link', $row->code) }}</a>
-                                @else
-                                <a href="{{ route('shorten.link', $row->code) }}?k={{ Auth::user()->code }}" target="_blank">{{ route('shorten.link', $row->code) }}?k={{ Auth::user()->code }}</a>
-                                @endguest
-
-                            </td>
+                            
                             <td>{{ $row->url }}</td>
-                            <td><a href="{{ route('show', $row->id) }}" target="_blank">{{ $row->counter }}</a></td>
+                            <td>
+                                @foreach ($options as $option)
+                                    {{ $option->name }}:
+                                    @guest
+                                    <strong>{{ route('shorten.link', $row->code) }}?o={{ $option->code }}</strong>
+                                    @else
+                                    <strong>{{ route('shorten.link', $row->code) }}?k={{ Auth::user()->code }}&o={{ $option->code }}</strong>
+                                    @endguest
+                                    <br/>
+                                @endforeach
+                            </td>
+                            <td><a href="{{ route('show', $row->id) }}" >{{ $row->counter }}</a></td>
                         </tr>
                     @endforeach
                 </tbody>

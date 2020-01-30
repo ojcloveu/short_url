@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Options;
 use App\ShortUrl;
+use App\refererDetail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 
@@ -19,8 +22,9 @@ class ShortUrlController extends Controller
     public function index()
     {
         $shortLinks = ShortUrl::latest()->get();
+        $options = Options::all();
    
-        return view('shortenLink', compact('shortLinks'));
+        return view('shortenLink', compact('shortLinks','options'));
     }
      
     /**
@@ -50,21 +54,39 @@ class ShortUrlController extends Controller
      */
     public function shortenLink(Request $request, $code)
     {
-        dd($GLOBALS,$_SERVER,$_REQUEST, $_ENV, $_COOKIE, $request);
         $k = $request->input('k', null);
+        $o = $request->input('o', null);
         $user = User::where('code', $k)->first();
+        $option = Options::where('code', $o)->first();
         $userId = $user? $user->id:null;
-        $httpReferer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+        $optionId = $option? $option->name:null;
+        $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
+        $REQUEST_TIME = $_SERVER['REQUEST_TIME'];
+
         DB::beginTransaction();
         try {
-            $find = ShortUrl::where('code', $code)->first();
+            $find = ShortUrl::where('code', $code)->firstOrFail();
             $find->counter += 1;
-            $find->save();
-    
-            $ref = $find->referers()->updateOrCreate(['refer_name'=>$httpReferer,'user_id' => $userId], [   'counter' => DB::raw('counter+1') ]);
+            
+
+            $refDetail = refererDetail::
+                                where(['short_urls_id' => $find->id, 'remote_addr' =>  $REMOTE_ADDR])->
+                                whereDate('created_at', Carbon::today())->get()->last();
+            if(!$refDetail){
+                $find->save();
+                $ref = $find->referers()->updateOrCreate(['refer_name'=>$optionId,'user_id' => $userId], [   'counter' => DB::raw('counter+1') ]);
+
+                $ref->refererDetails()->updateOrCreate(['short_urls_id'=>$find->id,'remote_addr' => $REMOTE_ADDR,'created_at'=> Carbon::today()],
+                 ['refer_name'=> $optionId,'request_at' => $REQUEST_TIME,   'counter' => DB::raw('counter+1') ,'user_id' => $userId]);
+
+            }
+            
+            
+
+
             DB::commit();
             return redirect($find->url);
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             return $e->getMessage();
         }  
@@ -73,7 +95,8 @@ class ShortUrlController extends Controller
     public function show($id)
     {
        $single = ShortUrl::findOrFail($id);
-       return view('show', compact('single'));
+       $options = Options::all();
+       return view('show', compact('single','options'));
     }
 
 

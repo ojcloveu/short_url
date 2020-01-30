@@ -14,4 +14,9 @@ class referer extends Model
     {
         return $this->hasMany('App\refererDetail','referers_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }
