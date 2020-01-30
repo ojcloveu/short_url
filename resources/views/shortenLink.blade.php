@@ -9,6 +9,7 @@
         <form method="POST" action="{{ route('generate.shorten.link.post') }}">
             @csrf
             <div class="input-group mb-3">
+              <input type="text" name="title" class="form-control" placeholder="Title" aria-label="Recipient's username" aria-describedby="basic-addon2">
               <input type="text" name="link" class="form-control" placeholder="Enter URL" aria-label="Recipient's username" aria-describedby="basic-addon2">
               <div class="input-group-append">
                 <button class="btn btn-success" type="submit">Generate Shorten Link</button>
@@ -39,7 +40,10 @@
                         <tr>
                             <td>{{ $row->id }}</td>
                             
-                            <td>{{ $row->url }}</td>
+                            <td>
+                                <a href="{{ $row->url }}">{{$row->title}}</a>
+                               
+                            </td>
                             <td>
                                 @foreach ($options as $option)
                                     {{ $option->name }}:

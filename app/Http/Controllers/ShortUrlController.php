@@ -35,10 +35,12 @@ class ShortUrlController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-           'link' => 'required|url'
+           'link' => 'required|url',
+           'title'=>'required'
         ]);
    
         $input['url'] = $request->link;
+        $input['title'] = $request->title;
         $input['code'] = Str::slug(Str::random(6));
    
         ShortUrl::create($input);
