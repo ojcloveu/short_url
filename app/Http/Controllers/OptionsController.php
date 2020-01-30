@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Options;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class OptionsController extends Controller
@@ -14,18 +15,11 @@ class OptionsController extends Controller
      */
     public function index()
     {
-        //
+        $options = Options::all();
+   
+        return view('options', compact('options'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,7 +29,16 @@ class OptionsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required'
+         ]);
+    
+         $input['name'] = $request->name;
+         $input['code'] = Str::slug(Str::random(3));
+    
+         Options::create($input);
+   
+         return redirect('/options')->with('success', 'Option Generated Successfully!');
     }
 
     /**
