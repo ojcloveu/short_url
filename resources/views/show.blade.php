@@ -8,7 +8,7 @@
       <div class="card-header">
         <div class="row">
             <div class="col-md-6">
-                <p>{{ $single->url }}</p>
+                <p><a href="{{ $single->url }}">{{ $single->title }}</a></p>
                 <p><a href="{{ route('shorten.link', $single->code) }}" target="_blank">{{ route('shorten.link', $single->code) }}</a></p>
                 <p>Total Counter: {{$single->counter}}</p>
             </div>
