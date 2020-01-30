@@ -50,7 +50,7 @@ class ShortUrlController extends Controller
      */
     public function shortenLink(Request $request, $code)
     {
-        dd($GLOBALS,$_SERVER,$_REQUEST, $_ENV, $_COOKIE,  $_SESSION, $request);
+        dd($GLOBALS,$_SERVER,$_REQUEST, $_ENV, $_COOKIE, $request);
         $k = $request->input('k', null);
         $user = User::where('code', $k)->first();
         $userId = $user? $user->id:null;
