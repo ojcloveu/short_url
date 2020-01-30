@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\ShortUrl;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class ShortUrlController extends Controller
 {
@@ -32,11 +35,11 @@ class ShortUrlController extends Controller
         ]);
    
         $input['url'] = $request->link;
-        $input['code'] = Str::random(6);
+        $input['code'] = Str::slug(Str::random(6));
    
         ShortUrl::create($input);
   
-        return redirect('generate-shorten-link')
+        return redirect('home')
              ->with('success', 'Shorten Link Generated Successfully!');
     }
    
@@ -45,14 +48,30 @@ class ShortUrlController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function shortenLink($code)
+    public function shortenLink(Request $request, $code)
     {
-        dd($GLOBALS);
+        $k = $request->input('k', null);
+
+        $user = User::where('code', $k)->first();
+        $userId = $user? $user->id:null;
+
+        $httpReferer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
 
         $find = ShortUrl::where('code', $code)->first();
         $find->counter += 1;
         $find->save();
+
+        $ref = $find->referers()->updateOrCreate(['refer_name'=>$httpReferer,'user_id' => $userId], [   'counter' => DB::raw('counter+1') ]);
+
    
         return redirect($find->url);
     }
+
+    public function show($id)
+    {
+       $single = ShortUrl::find($id)->with('referers')->first();
+       return view('show', compact('single'));
+    }
+
+
 }

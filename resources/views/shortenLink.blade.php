@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>How to create url shortener using Laravel? - ItSolutionStuff.com</h1>
+    <h1>How to create url shortener using Laravel?</h1>
    
     <div class="card">
       <div class="card-header">
@@ -37,9 +37,16 @@
                     @foreach($shortLinks as $row)
                         <tr>
                             <td>{{ $row->id }}</td>
-                            <td><a href="{{ route('shorten.link', $row->code) }}" target="_blank">{{ route('shorten.link', $row->code) }}</a></td>
+                            <td>
+                                @guest
+                                <a href="{{ route('shorten.link', $row->code) }}" target="_blank">{{ route('shorten.link', $row->code) }}</a>
+                                @else
+                                <a href="{{ route('shorten.link', $row->code) }}?k={{ Auth::user()->code }}" target="_blank">{{ route('shorten.link', $row->code) }}?k={{ Auth::user()->code }}</a>
+                                @endguest
+
+                            </td>
                             <td>{{ $row->url }}</td>
-                            <td>{{ $row->counter }}</td>
+                            <td><a href="{{ route('show', $row->id) }}" target="_blank">{{ $row->counter }}</a></td>
                         </tr>
                     @endforeach
                 </tbody>

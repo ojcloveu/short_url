@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateChannelsTable extends Migration
+class CreateRefererDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,14 @@ class CreateChannelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('channels', function (Blueprint $table) {
+        Schema::create('referer_details', function (Blueprint $table) {
             $table->bigIncrements('id');
-          
+            
+            $table->bigInteger('referers_id');
+            $table->bigInteger('short_urls_id');
+            $table->bigInteger('user_id')->nullable()->default(0);
+            $table->string('refer_name')->nullable();
+        
             $table->timestamps();
         });
     }
@@ -27,6 +32,6 @@ class CreateChannelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('channels');
+        Schema::dropIfExists('referer_details');
     }
 }
