@@ -39,7 +39,7 @@ class ShortUrlController extends Controller
    
         ShortUrl::create($input);
   
-        return redirect('home')
+        return redirect('/')
              ->with('success', 'Shorten Link Generated Successfully!');
     }
    
@@ -69,7 +69,7 @@ class ShortUrlController extends Controller
 
     public function show($id)
     {
-       $single = ShortUrl::find($id)->with('referers')->first();
+       $single = ShortUrl::findOrFail($id);
        return view('show', compact('single'));
     }
 
